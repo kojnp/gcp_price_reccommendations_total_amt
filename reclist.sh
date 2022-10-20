@@ -12,7 +12,6 @@ PROJECTS_TO_INSPECT=("MY_PROJECT_ID_1" "MY_PROJECT_ID_2" )
 declare -a recommenderTypes=("google.compute.address.IdleResourceRecommender" "google.compute.disk.IdleResourceRecommender" "google.compute.instance.IdleResourceRecommender" "google.compute.image.IdleResourceRecommender" "google.cloudsql.instance.IdleRecommender" "google.cloudsql.instance.OverprovisionedRecommender")
 
 get_cost_rec_id () {
-    # gcloud recommender recommendations describe RECOMMENDATION_ID --project=${PROJECT} --location=${LOCATION} --recommender=${RECOMMENDER}
     echo "getting rec details"
     local_dollar_amt=$(gcloud recommender recommendations describe $1 --project=$2 --location=$3 --recommender=$4 --format="value(primaryImpact.costProjection.cost.units)")
     echo "dollar_amt=$local_dollar_amt"
@@ -48,14 +47,12 @@ total_dollar_amt=0
 for PROJ in $PROJECTS_TO_INSPECT
 do
     echo "PROJ=$PROJ"
-    #PROJ="new-ml-sme"
 
     set_locations $PROJ
     
-    # API [recommender.googleapis.com] not enabled on project [890692501904]. Would you like to enable and retry (this will take a few minutes)? (y/N)?  y
     gcloud config set project $PROJ --quiet
     gcloud services enable recommender.googleapis.com --quiet
-    # gcloud recommender recommendations list --location=global --recommender=google.compute.instance.IdleResourceRecommender --project=$PROJ --quiet
+
     for location in ${locations[@]};
     do
         for recommender in ${recommenderTypes[@]};
